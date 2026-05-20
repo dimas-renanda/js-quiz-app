@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><title>Quiz App</title>
+<style>
+  body{margin:0;background:#0f172a;color:#f1f5f9;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .card{background:#1e293b;border-radius:16px;padding:2rem;max-width:560px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  h1{margin:0 0 .5rem;font-size:1.5rem}#prog{opacity:.5;font-size:.85rem;margin-bottom:1.5rem}
+  #qtext{font-size:1.2rem;margin-bottom:1.5rem;line-height:1.5}
+  .opts{display:grid;gap:.75rem}
+  .opt{background:#334155;border:2px solid transparent;padding:1rem;border-radius:10px;cursor:pointer;text-align:left;font-size:1rem;color:#f1f5f9;transition:all .2s}
+  .opt:hover:not(:disabled){border-color:#60a5fa;background:#3b4f6a}
+  .opt.correct{background:#166534;border-color:#4ade80}
+  .opt.wrong{background:#7f1d1d;border-color:#f87171}
+  #feedback{margin:1rem 0;font-size:.95rem;min-height:1.2em}
+  #next{background:#3b82f6;color:#fff;border:none;padding:.75rem 2rem;border-radius:8px;font-size:1rem;cursor:pointer;font-weight:600;display:none}
+  #result{text-align:center;display:none}#result h2{font-size:2rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>❓ Quiz</h1>
+  <div id="prog"></div>
+  <div id="quiz">
+    <div id="qtext"></div>
+    <div class="opts" id="opts"></div>
+    <div id="feedback"></div>
+    <button id="next" onclick="nextQ()">Next →</button>
+  </div>
+  <div id="result">
+    <h2 id="score"></h2>
+    <p id="grade"></p>
+    <button onclick="restart()" style="background:#3b82f6;color:#fff;border:none;padding:.75rem 2rem;border-radius:8px;font-size:1rem;cursor:pointer">Try Again</button>
+  </div>
+</div>
+<script>
+const questions=[
+  {q:"What does HTML stand for?",opts:["Hyper Text Markup Language","High Text Machine Language","Hyperlink Text Mode Language","Hyper Transfer Markup Language"],a:0},
+  {q:"Which language runs in the browser natively?",opts:["Python","Ruby","JavaScript","Java"],a:2},
+  {q:"What does API stand for?",opts:["Application Programming Interface","Advanced Program Interaction","Automated Processing Index","Application Process Integration"],a:0},
+  {q:"What is 2^10?",opts:["512","1024","2048","256"],a:1},
+  {q:"Which HTTP method is used to send data to a server?",opts:["GET","DELETE","PUT","POST"],a:3},
+];
+let idx=0,score=0;
+function show(){
+  const q=questions[idx];
+  document.getElementById('prog').textContent=`Question ${idx+1} of ${questions.length}`;
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('opts').innerHTML=q.opts.map((o,i)=>`<button class="opt" onclick="answer(${i})">${o}</button>`).join('');
+  document.getElementById('feedback').textContent='';
+  document.getElementById('next').style.display='none';
+}
+function answer(i){
+  const q=questions[idx];
+  const opts=document.querySelectorAll('.opt');
+  opts.forEach(o=>o.disabled=true);
+  if(i===q.a){opts[i].classList.add('correct');score++;document.getElementById('feedback').textContent='✅ Correct!';}
+  else{opts[i].classList.add('wrong');opts[q.a].classList.add('correct');document.getElementById('feedback').textContent='❌ Wrong!';}
+  document.getElementById('next').style.display='inline-block';
+}
+function nextQ(){idx++;if(idx<questions.length)show();else showResult()}
+function showResult(){
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('result').style.display='block';
+  const pct=Math.round(score/questions.length*100);
+  document.getElementById('score').textContent=`${score}/${questions.length}`;
+  document.getElementById('grade').textContent=pct>=80?'🌟 Excellent!':pct>=60?'👍 Good job!':'📚 Keep studying!';
+}
+function restart(){idx=0;score=0;document.getElementById('quiz').style.display='block';document.getElementById('result').style.display='none';show()}
+show();
+</script>
+</body></html>
